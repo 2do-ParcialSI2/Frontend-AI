@@ -36,7 +36,11 @@ Este sistema permite realizar operaciones clave como:
    git clone https://github.com/tu-usuario/sistema-gestion-escolar-frontend.git
    cd sistema-gestion-escolar-frontend
     ```
-2. Ejecuta la aplicación en modo desarrollo:
+2. Instala las dependencias necesarias:
+    ```bash
+    npm install
+    ```
+3. Ejecuta la aplicación en modo desarrollo:
     ```bash
     ng serve
     ```
