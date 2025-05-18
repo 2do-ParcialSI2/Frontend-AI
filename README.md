@@ -35,12 +35,12 @@ Este sistema permite realizar operaciones clave como:
    ```bash
    git clone https://github.com/tu-usuario/sistema-gestion-escolar-frontend.git
    cd sistema-gestion-escolar-frontend
-```
+    ```
 2. Ejecuta la aplicación en modo desarrollo:
-```bash
-   ng serve
-```
+    ```bash
+    ng serve
+    ```
 3. Accede a la aplicación web en:
-```bash
-   http://localhost:4200
-```
+    ```bash
+    http://localhost:4200
+    ```
