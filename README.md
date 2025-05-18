@@ -33,8 +33,8 @@ Este sistema permite realizar operaciones clave como:
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/sistema-gestion-escolar-frontend.git
-   cd sistema-gestion-escolar-frontend
+   git clone https://github.com/2do-ParcialSI2/Frontend-AI.git
+   cd Frontend-AI
     ```
 2. Instala las dependencias necesarias:
     ```bash
