@@ -1,0 +1,264 @@
+<nav class="fixed top-0 z-50 w-full shadow-md border-b" style="background-color: #020122; border-color: #020122;">
+  <div class="px-3 py-3 lg:px-5 lg:pl-3">
+    <div class="flex items-center justify-between">
+      <!-- Logo y botón de menú -->
+      <div class="flex items-center justify-start rtl:justify-end">
+        <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar"
+          type="button"
+          class="inline-flex items-center p-2 text-sm text-white rounded-lg md:hidden hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
+          <span class="sr-only">Abrir menú</span>
+          <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+            <path clip-rule="evenodd" fill-rule="evenodd"
+              d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z" />
+          </svg>
+        </button>
+        <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 -960 960 960"
+            fill="currentColor">
+            <path
+              d="M480-120 200-272v-240L40-600l440-240 440 240v320h-80v-276l-80 44v240L480-120Zm0-332 274-148-274-148-274 148 274 148Zm0 241 200-108v-151L480-360 280-470v151l200 108Zm0-241Zm0 90Zm0 0Z" />
+          </svg>
+
+          <span class="self-center text-xl font-semibold whitespace-nowrap text-white">Sistema de Gestión y
+            Planificación Escolar</span>
+        </a>
+      </div>
+
+      <!-- Menú de usuario -->
+      <div class="flex items-center">
+        <div class="relative ml-3">
+          <button type="button" class="flex text-sm rounded-full focus:ring-4 focus:ring-blue-600 focus:ring-opacity-50"
+            id="user-menu-button" aria-expanded="false" data-dropdown-toggle="dropdown-user">
+            <span class="sr-only">Abrir menú de usuario</span>
+            <div class="relative w-10 h-10 overflow-hidden bg-blue-100 rounded-full">
+              <svg class="absolute w-12 h-12 text-blue-500 -left-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd">
+                </path>
+              </svg>
+            </div>
+          </button>
+
+          <!-- Dropdown -->
+          <div id="dropdown-user"
+            class="z-50 hidden absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+            <div class="px-4 py-3">
+              <p class="text-sm font-medium text-gray-900 truncate">
+                {{ nombreUsuario }}
+              </p>
+              <p class="text-sm font-medium text-gray-500 truncate">
+                {{ emailUsuario }}
+              </p>
+            </div>
+            <ul class="py-1 text-sm text-gray-700">
+              <li>
+                <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                  <svg class="w-4 h-4 mr-2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 005 10a6 6 0 0012 0c0-.07-.004-.137-.01-.203A4.986 4.986 0 0010 11z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                  Mi perfil
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                  <svg class="w-4 h-4 mr-2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                      d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                  Configuración
+                </a>
+              </li>
+            </ul>
+            <div class="py-1">
+              <a (click)="logout()"
+                class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer">
+                <svg class="w-4 h-4 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V7.414a1 1 0 00-.293-.707L11.414 2.414A1 1 0 0010.707 2H4a1 1 0 00-1 1zm9 5a1 1 0 00-1-1H8a1 1 0 00-1 1v8a1 1 0 001 1h3a1 1 0 001-1v-3a1 1 0 00-1-1H9a1 1 0 010-2h2a1 1 0 001-1V8zm-2-3h-.5a.5.5 0 00-.5.5V5a.5.5 0 00.5.5H10V5z"
+                    clip-rule="evenodd"></path>
+                  <path d="M9 11a1 1 0 1 1 2 0v3a1 1 0 1 1-2 0v-3z"></path>
+                </svg>
+                Cerrar sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<aside id="logo-sidebar"
+  class="fixed top-0 left-0 z-40 w-60 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 shadow-md"
+  aria-label="Sidebar">
+  <div class="h-full px-3 pb-4 overflow-y-auto bg-white">
+    <div class="pt-4 pb-2 px-3">
+      <div class="flex items-center mb-3">
+        <div class="relative w-10 h-10 mr-3 overflow-hidden bg-blue-100 rounded-full">
+          <svg class="absolute w-12 h-12 text-blue-500 -left-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd">
+            </path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-gray-900">{{ nombreUsuario }}</p>
+          <p class="text-xs font-medium text-gray-500">{{ emailUsuario }}</p>
+        </div>
+      </div>
+      <div class="border-t border-gray-200 my-1"></div>
+    </div>
+
+    <ul class="space-y-2 font-medium">
+      <li class="pt-2">
+        <span class="px-3 text-xs font-bold uppercase text-gray-500">Administración</span>
+      </li>
+      <li>
+        <button (click)="navigateTo('usuario')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Z" />
+          </svg>
+
+          <span class="ml-3">Usuarios</span>
+        </button>
+      </li>
+
+      <li>
+        <button (click)="navigateTo('materias')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h480q33 0 56.5 23.5T800-800v640q0 33-23.5 56.5T720-80H240Zm0-80h480v-640h-80v280l-100-60-100 60v-280H240v640Zm200-360 100-60 100 60-100-60-100 60Z" />
+          </svg>
+          <span class="ml-3">Materias</span>
+        </button>
+      </li>
+
+      <li>
+        <button (click)="navigateTo('cursos')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M120-120v-80h80v-640h400v40h160v600h80v80H680v-600h-80v600H120Zm160-640v560-560Zm160 320q17 0 28.5-11.5T480-480q0-17-11.5-28.5T440-520q-17 0-28.5 11.5T400-480q0 17 11.5 28.5T440-440ZM280-200h240v-560H280v560Z" />
+          </svg>
+
+          <span class="ml-3">Cursos</span>
+        </button>
+      </li>
+
+      <li>
+        <button (click)="navigateTo('horarios')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z" />
+          </svg>
+
+
+          <span class="ml-3">Horarios</span>
+        </button>
+      </li>
+
+      <li>
+        <button (click)="navigateTo('matricula')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M440-200h80v-40h40q17 0 28.5-11.5T600-280v-120q0-17-11.5-28.5T560-440H440v-40h160v-80h-80v-40h-80v40h-40q-17 0-28.5 11.5T360-520v120q0 17 11.5 28.5T400-360h120v40H360v80h80v40ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-480H520ZM240-800v160-160 640-640Z" />
+          </svg>
+
+
+          <span class="ml-3">Matriculas</span>
+        </button>
+      </li>
+
+      <li>
+        <button (click)="navigateTo('reportes')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M120-120v-80l80-80v160h-80Zm160 0v-240l80-80v320h-80Zm160 0v-320l80 81v239h-80Zm160 0v-239l80-80v319h-80Zm160 0v-400l80-80v480h-80ZM120-327v-113l280-280 160 160 280-280v113L560-447 400-607 120-327Z" />
+          </svg>
+          <span class="ml-3">Reportes</span>
+        </button>
+      </li>
+
+      <li class="pt-4">
+        <span class="px-3 text-xs font-bold uppercase text-gray-500">Control Estudiantil</span>
+      </li>
+
+      <li>
+        <button (click)="navigateTo('asistencias')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q65 0 123 19t107 53l-58 59q-38-24-81-37.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160q133 0 226.5-93.5T800-480q0-18-2-36t-6-35l65-65q11 32 17 66t6 70q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm-56-216L254-466l56-56 114 114 400-401 56 56-456 457Z" />
+          </svg>
+          <span class="ml-3">Asistencias</span>
+        </button>
+      </li>
+
+      <li>
+        <button (click)="navigateTo('participacion')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M360-80v-529q-91-24-145.5-100.5T160-880h80q0 83 53.5 141.5T430-680h100q30 0 56 11t47 32l181 181-56 56-158-158v478h-80v-240h-80v240h-80Zm120-640q-33 0-56.5-23.5T400-800q0-33 23.5-56.5T480-880q33 0 56.5 23.5T560-800q0 33-23.5 56.5T480-720Z" />
+          </svg>
+
+          <span class="ml-3">Participación</span>
+        </button>
+      </li>
+
+      <li>
+        <button (click)="navigateTo('tareas')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790Z" />
+          </svg>
+
+          <span class="ml-3">Tareas</span>
+        </button>
+      </li>
+
+      <li>
+        <button (click)="navigateTo('evaluaciones')" type="button"
+          class="w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group transition-colors duration-200">
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+            fill="currentColor" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M80 0v-160h800V0H80Zm160-320h56l312-311-29-29-28-28-311 312v56Zm-80 80v-170l448-447q11-11 25.5-17t30.5-6q16 0 31 6t27 18l55 56q12 11 17.5 26t5.5 31q0 15-5.5 29.5T777-687L330-240H160Z" />
+          </svg>
+
+          <span class="ml-3">Evaluaciones</span>
+        </button>
+      </li>
+
+      <li class="pt-6">
+        <button (click)="logout()" type="button"
+          class="w-full flex items-center p-2 text-red-600 rounded-lg hover:bg-red-50 group cursor-pointer transition-colors duration-200">
+          <svg class="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors duration-200" fill="currentColor"
+            viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V7.414a1 1 0 00-.293-.707L11.414 2.414A1 1 0 0010.707 2H4a1 1 0 00-1 1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <span class="ml-3 font-medium">Cerrar sesión</span>
+        </button>
+      </li>
+    </ul>
+  </div>
+</aside>
