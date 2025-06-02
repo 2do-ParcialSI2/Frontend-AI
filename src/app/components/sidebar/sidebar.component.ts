@@ -14,10 +14,9 @@ export class SidebarComponent implements OnInit {
   nombreUsuario: string = '';
   emailUsuario: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
-    this.nombreUsuario = this.authService.obtenerNombre();
     this.emailUsuario = this.authService.obtenerEmail();
   }
 
@@ -26,7 +25,7 @@ export class SidebarComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.cerrarSesion();
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 }

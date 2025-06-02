@@ -13,14 +13,12 @@ import Swal from 'sweetalert2';
   templateUrl: './register-admin.component.html'
 })
 export class RegisterAdminComponent {
-  nombre: string = '';
-  apellido: string = '';
-  telefono: string = '';
+
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   onSubmit() {
     // Validar que las contraseñas coincidan
@@ -34,16 +32,14 @@ export class RegisterAdminComponent {
   }
 
   registrarUsuario() {
-    this.authService.registroAdmin(this.nombre, this.apellido, this.telefono, this.email, this.password).subscribe({
+    this.authService.registroAdmin(this.email, this.password).subscribe({
       next: (res) => {
         // Limpiar los campos del formulario
-        this.nombre = '';
-        this.apellido = '';
-        this.telefono = '';
+
         this.email = '';
         this.password = '';
         this.confirmPassword = '';
-        
+
         // Mostrar mensaje de éxito con SweetAlert2
         Swal.fire({
           icon: 'success',
@@ -59,7 +55,7 @@ export class RegisterAdminComponent {
       },
       error: (err) => {
         console.error('Error en el registro:', err);
-        
+
         // Mostrar mensaje de error con SweetAlert2
         Swal.fire({
           icon: 'error',

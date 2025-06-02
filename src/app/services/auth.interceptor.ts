@@ -9,8 +9,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   // Endpoints que no deben llevar token
   const publicEndpoints = [
-    'auth/login',
-    'auth/register'
+    'login/'
   ];
 
   const isPublic = publicEndpoints.some(url => req.url.includes(url));
@@ -18,6 +17,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authReq = isPublic
     ? req
     : req.clone({
-        headers: req.headers.set('Authorization', `Bearer ${token}`)
-      });
-  return next(authReq);};
+      headers: req.headers.set('Authorization', `Bearer ${token}`)
+    });
+  return next(authReq);
+};

@@ -1,71 +1,50 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 import Swal from 'sweetalert2'
-//import { error } from 'console';
-import { UserService } from '../../services/user.service';
-import { RoleService } from '../../services/rol.service';
+import { PadresTutoresService } from '../../services/padres-tutores.service';
 
 @Component({
-  selector: 'app-usuarios',
+  selector: 'app-padres-tutores',
   standalone: true,
   imports: [FormsModule, CommonModule],
-  templateUrl: './usuario.component.html',
-  styleUrl: './usuario.component.css'
+  templateUrl: './padres-tutores.component.html',
+  styleUrl: './padres-tutores.component.css'
 })
-
-export class UsuarioComponent implements OnInit {
-  usersFiltrados: any[] = []; // visibles según filtro  
+export class PadresTutoresComponent implements OnInit {
+  tutoresFiltrados: any[] = []; // visibles según filtro  
   filtro: string = '';
-  isModalRegisterUserOpen: boolean = false;
-  isModalUpdateUserOpen: boolean = false;
+  isModalRegisterOpen: boolean = false;
+  isModalUpdateOpen: boolean = false;
   email = '';
   password = '';
   firstName = '';
   lastName = '';
   genero = '';
+  parentesco = '';
   activo = true; // puede cambiarse con checkbox
-  selectedRole = '';
-  roles: Array<any>;
-  users: any[] = [];
+  telefono: number | null = null;
+  tutores: any[] = [];
   emailUpdate!: string;
   passwordUpdate: string = '';
   firstNameUpdate!: string;
   lastNameUpdate!: string;
   generoUpdate!: string;
+  parentescoUpdate!: string;
+  telefonoUpdate!: number;
   activoUpdate: boolean = true;
-  roleUpdate!: number;
-  userIdSelected!: number;
+  idSelected!: number;
 
-
-  constructor(private userService: UserService, private roleService: RoleService) {
-    this.roles = [];
+  constructor(private tutoresService: PadresTutoresService) {
   }
 
   ngOnInit(): void {
-    this.getRoles();
-    this.getUsers();
-  }
-
-
-  getRoles() {
-    this.roleService.getRols().subscribe(
-      {
-        next: (resp: any) => {
-          console.log(resp);
-          this.roles = resp;
-        },
-        error: (error: any) => {
-          console.log(error);
-        }
-      }
-    );
+    this.getAll();
   }
 
   activeRegisterForm() {
     this.limpiarFormulario();
-    this.isModalRegisterUserOpen = true;
+    this.isModalRegisterOpen = true;
   }
 
   // Método para limpiar el formulario
@@ -76,12 +55,13 @@ export class UsuarioComponent implements OnInit {
     this.lastName = '';
     this.genero = '';
     this.activo = true;
-    this.selectedRole = '';
+    this.parentesco = '';
+    this.telefono = null;
   }
 
-  // Método principal para registrar usuarios
-  registerUser() {
-    if (!this.password || !this.email || !this.selectedRole || !this.firstName || !this.lastName || !this.genero) {
+  // Método principal para registrar 
+  register() {
+    if (!this.password || !this.email || !this.parentesco || !this.firstName || !this.lastName || !this.genero || this.telefono == null) {
       Swal.fire({
         position: "center",
         icon: "error",
@@ -93,24 +73,26 @@ export class UsuarioComponent implements OnInit {
     }
 
     Swal.fire({
-      title: 'Registrando usuario...',
+      title: 'Registrando información...',
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       }
     });
 
-    const user = {
+    const Data = {
       password: this.password,
       email: this.email,
       first_name: this.firstName,
       last_name: this.lastName,
       genero: this.genero,
       activo: this.activo,
-      roles: [parseInt(this.selectedRole)]
+      parentesco: this.parentesco,
+      telefono: this.telefono,
+      roles: ['PADRE_TUTOR']
     };
 
-    this.userService.registerUser(user).subscribe({
+    this.tutoresService.register(Data).subscribe({
       next: (resp: any) => {
         console.log(resp);
         Swal.close();
@@ -118,11 +100,11 @@ export class UsuarioComponent implements OnInit {
         const esExitoso = resp.id || (resp.data && resp.data.id) || resp.statusCode === 200 || resp.statusCode === 201;
 
         if (esExitoso) {
-          this.getUsers();
+          this.getAll();
           Swal.fire({
             position: "center",
             icon: "success",
-            title: "Usuario registrado correctamente",
+            title: "Registrado correctamente",
             showConfirmButton: false,
             timer: 2000
           });
@@ -130,24 +112,24 @@ export class UsuarioComponent implements OnInit {
           this.limpiarFormulario();
 
           setTimeout(() => {
-            this.closeRegisterUserModal();
+            this.closeRegisterModal();
           }, 2100);
         } else {
           Swal.fire({
             position: "center",
             icon: "error",
-            title: "Error al registrar el usuario",
+            title: "Error al registrar",
             text: resp.message || "Verifica los datos ingresados",
             showConfirmButton: true
           });
         }
       },
       error: (error: any) => {
-        console.log('Error al registrar usuario:', error);
+        console.log('Error al registrar:', error);
         Swal.fire({
           position: "center",
           icon: "error",
-          title: "Error al registrar el usuario",
+          title: "Error al registrar",
           text: error.error?.message || "Ocurrió un error en el servidor",
           showConfirmButton: true
         });
@@ -155,44 +137,35 @@ export class UsuarioComponent implements OnInit {
     });
   }
 
-
-  getUsers(): void {
-    // Mostrar SweetAlert de carga
-    Swal.fire({
-      title: 'Cargando usuarios...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
-
-    this.userService.getUsers().subscribe({
+  getAll(): void {
+    this.tutoresService.getAll().subscribe({
       next: (resp: any) => {
-        Swal.close(); // Cerrar la alerta de carga
-
-        let usuarios: any[] = [];
+        console.log('Tutores cargados:', resp);
+        let tutores: any[] = [];
 
         // Verifica si la respuesta viene anidada (por ejemplo { data: [...] }) o es directamente un array
         if (resp && Array.isArray(resp)) {
-          usuarios = resp;
+          tutores = resp;
         } else if (resp && resp.data && Array.isArray(resp.data)) {
-          usuarios = resp.data;
+          tutores = resp.data;
         } else {
-          console.warn('Respuesta inesperada al obtener usuarios:', resp);
+          console.warn('Respuesta inesperada al obtener tutores:', resp);
           Swal.fire({
             icon: 'warning',
             title: 'Advertencia',
             text: 'El formato de la respuesta del servidor no es el esperado.'
           });
-          usuarios = [];
+          tutores = [];
         }
 
-        // Asignar los datos a ambos arrays
-        this.users = usuarios;
-        this.usersFiltrados = [...usuarios];
+        // Asignar los datos
+        this.tutores = tutores;
+        this.tutoresFiltrados = [...tutores];
 
         // Feedback positivo si deseas
         Swal.fire({
           icon: 'success',
-          title: 'Usuarios cargados',
+          title: 'Información cargada correctamente',
           timer: 1000,
           showConfirmButton: false
         });
@@ -201,14 +174,12 @@ export class UsuarioComponent implements OnInit {
       error: (error: any) => {
         Swal.close();
 
-        console.error('Error al obtener usuarios:', error);
-        this.users = [];
-        this.usersFiltrados = [];
-
+        console.error('Error al obtener la  data:', error);
+        this.tutoresFiltrados = [];
         Swal.fire({
           icon: 'error',
           title: 'Error al cargar',
-          text: 'No se pudieron cargar los usuarios. Por favor, intente nuevamente.'
+          text: 'No se pudieron cargar los tutores. Por favor, intente nuevamente.'
         });
       }
     });
@@ -220,67 +191,69 @@ export class UsuarioComponent implements OnInit {
     return 'No especificado';
   }
 
-  buscarUsuarios(): void {
+  buscar(): void {
     const termino = this.filtro.trim().toLowerCase();
     if (termino === '') {
-      this.usersFiltrados = this.users;
+      this.tutoresFiltrados = this.tutores;
     } else {
-      this.usersFiltrados = this.users.filter(sub =>
-        sub.nombre.toLowerCase().includes(termino)
+      this.tutoresFiltrados = this.tutores.filter(sub =>
+        `${sub.first_name} ${sub.last_name}`.toLowerCase().includes(termino)
       );
     }
   }
 
-  openModalToUpdateUser(user: any) {
-    this.isModalUpdateUserOpen = true;
+  openModalToUpdate(tutor: any) {
+    this.isModalUpdateOpen = true;
     this.passwordUpdate = '';
-    this.emailUpdate = user.email;
-    this.firstNameUpdate = user.first_name;
-    this.lastNameUpdate = user.last_name;
-    this.generoUpdate = user.genero;
-    this.activoUpdate = user.activo;
-    this.roleUpdate = user.rol?.id;
-    this.userIdSelected = user.id;
+    this.emailUpdate = tutor.email;
+    this.firstNameUpdate = tutor.first_name;
+    this.lastNameUpdate = tutor.last_name;
+    this.generoUpdate = tutor.genero;
+    this.parentescoUpdate = tutor.parentesco;
+    this.activoUpdate = tutor.activo;
+    this.idSelected = tutor.id;
+    this.telefonoUpdate = tutor.telefono;
   }
 
-  actualizarUsuario() {
+  actualizar() {
     Swal.fire({
-      title: 'Actualizando usuario...',
+      title: 'Actualizando información...',
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       }
     });
 
-    let userData: any = {
+    let Data: any = {
       email: this.emailUpdate,
       first_name: this.firstNameUpdate,
       last_name: this.lastNameUpdate,
       genero: this.generoUpdate,
       activo: this.activoUpdate,
-      roles: [this.roleUpdate]
+      parentesco: this.parentescoUpdate,
+      telefono: this.telefonoUpdate,
     };
 
     if (this.passwordUpdate && this.passwordUpdate.trim() !== '') {
-      userData.password = this.passwordUpdate;
+      Data.password = this.passwordUpdate;
     }
 
-    console.log('Datos de actualización:', userData);
+    console.log('Datos de actualización:', Data);
 
-    this.userService.updateUser(this.userIdSelected, userData).subscribe(
+    this.tutoresService.update(this.idSelected, Data).subscribe(
       {
         next: (resp: any) => {
+          this.getAll();
           Swal.close();
-          this.getUsers();
           Swal.fire({
             position: "center",
             icon: "success",
-            title: "Usuario actualizado correctamente",
+            title: "Información actualizada correctamente",
             showConfirmButton: false,
             timer: 2000
           });
           setTimeout(() => {
-            this.closeUpdateUserModal();
+            this.closeUpdateModal();
           }, 2100);
         },
         error: (error: any) => {
@@ -288,7 +261,7 @@ export class UsuarioComponent implements OnInit {
           Swal.fire({
             position: "center",
             icon: "error",
-            title: "Error al actualizar el usuario",
+            title: "Error al actualizar los datos",
             text: error.error?.message || "Ocurrió un error en el servidor",
             showConfirmButton: true
           });
@@ -297,12 +270,11 @@ export class UsuarioComponent implements OnInit {
     );
   }
 
-
-  deleteUser(user: any) {
+  delete(tutor: any) {
     // Confirmación antes de eliminar
     Swal.fire({
       title: '¿Estás seguro?',
-      text: `¿Deseas eliminar al usuario ${user.nombre}?`,
+      text: `¿Deseas eliminar al tutor ${tutor.nombre}?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -313,24 +285,21 @@ export class UsuarioComponent implements OnInit {
       if (result.isConfirmed) {
         // Mostrar indicador de carga
         Swal.fire({
-          title: 'Eliminando usuario...',
+          title: 'Eliminando...',
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
           }
         });
 
-        this.userService.deleteUser(user.id).subscribe({
+        this.tutoresService.delete(tutor.id).subscribe({
           next: (resp: any) => {
+            this.getAll();
             console.log(resp);
-
-            // Actualizar la lista de usuarios primero
-            this.getUsers();
-
             Swal.fire({
               position: "center",
               icon: "success",
-              title: "Usuario eliminado correctamente",
+              title: "Eliminado correctamente",
               showConfirmButton: false,
               timer: 2000
             });
@@ -341,7 +310,7 @@ export class UsuarioComponent implements OnInit {
             Swal.fire({
               position: "center",
               icon: "error",
-              title: "Error al eliminar el usuario",
+              title: "Error al eliminar",
               text: error.error?.message || "Ocurrió un error en el servidor",
               showConfirmButton: true
             });
@@ -351,17 +320,11 @@ export class UsuarioComponent implements OnInit {
     });
   }
 
-  updateRoleId($event: any) {
-    this.roleUpdate = $event;
-    console.log(this.roleUpdate);
-    console.log($event);
+  closeRegisterModal() {
+    this.isModalRegisterOpen = false;
   }
 
-  closeRegisterUserModal() {
-    this.isModalRegisterUserOpen = false;
-  }
-
-  closeUpdateUserModal() {
-    this.isModalUpdateUserOpen = false;
+  closeUpdateModal() {
+    this.isModalUpdateOpen = false;
   }
 }

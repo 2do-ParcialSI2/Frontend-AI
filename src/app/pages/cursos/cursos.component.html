@@ -1,0 +1,549 @@
+<div class="p-4 sm:ml-60 pt-20 bg-gray-50 min-h-screen">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Gestión de Cursos</h1>
+        <p class="text-gray-600">Administra los cursos del sistema</p>
+    </div>
+
+    <!-- Panel de filtros y acciones -->
+    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <!-- Buscador -->
+            <div class="relative flex-grow max-w-md">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                    </svg>
+                </div>
+                <input type="text" [(ngModel)]="filtro" (input)="buscar()" placeholder="Buscar curso..."
+                    class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+
+            <!-- Botón para registrar  -->
+            <button (click)="activeRegisterForm()" type="button"
+                class="flex items-center justify-center text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 transition duration-150 ease-in-out">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Crear Nuevo
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">ID</th>
+                        <th scope="col" class="px-6 py-3">Nombre</th>
+                        <th scope="col" class="px-6 py-3">Turno</th>
+                        <th scope="col" class="px-6 py-3">Materias Asignadas</th>
+                        <th scope="col" class="px-6 py-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of Filtrados" class="hover:bg-gray-50">
+                        <td class="p-2 border">{{ data.id }}</td>
+                        <td class="p-2 border">{{ data.nombre }}</td>
+                        <td class="p-2 border">{{ data.turno }}</td>
+                        <td class="p-2 border cursor-pointer" (click)="openModalDetalles(data)">
+                            {{ getNombresMaterias(data) }}
+                        </td>
+                        <td class="p-2 border">
+                            <div class="flex space-x-2">
+                                <button (click)="openModalToUpdate(data)" class="text-blue-600 hover:text-blue-900"
+                                    title="Editar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <button (click)="delete(data)" class="text-red-600 hover:text-red-900" title="Eliminar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Estado vacío -->
+                    <tr *ngIf="Filtrados.length === 0">
+                        <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                </path>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-semibold text-gray-900">
+                                No se encontraron estudiantes
+                            </h3>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Comienza por crear un nuevo estudiante.
+                            </p>
+                            <div class="mt-6">
+                                <button (click)="activeRegisterForm()" type="button"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    Crear Nuevo
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para registrar -->
+<div *ngIf="isModalRegisterOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 bg-blue-600">
+            <h3 class="text-lg font-medium text-white">Registrar nuevo</h3>
+            <button (click)="closeRegisterModal()" class="text-white hover:text-gray-200">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form autocomplete="off" (submit)="register()" class="p-6">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                <div>
+                    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre *</label>
+                    <input type="text" id="nombre" [(ngModel)]="nombre" name="nombre" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" />
+                </div>
+
+                <div>
+                    <label for="turno" class="block text-sm font-medium text-gray-700">Turno *</label>
+                    <select id="turno" [(ngModel)]="selectedTurno" name="selectedturno" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <option value="" disabled>Seleccionar turno</option>
+                        <option *ngFor="let turno of turnos" [value]="turno.value">{{ turno.label }}</option>
+                    </select>
+                </div>
+
+
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" (click)="closeRegisterModal()" class="...">Cancelar</button>
+                <button type="submit" class="...">Registrar</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- Modal para actualizar -->
+<div *ngIf="isModalUpdateOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 bg-blue-600">
+            <h3 class="text-lg font-medium text-white">Actualizar Información</h3>
+            <button (click)="closeUpdateModal()" class="text-white hover:text-gray-200">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form (submit)="actualizar()" class="p-6">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <!-- Nombre -->
+                <div>
+                    <label for="nombreUpdate" class="block text-sm font-medium text-gray-700">Nombre *</label>
+                    <input type="text" id="nombreUpdate" [(ngModel)]="nombreUpdate" name="nombreUpdate" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" />
+                </div>
+
+                <div>
+                    <label for="turno" class="block text-sm font-medium text-gray-700">Turno *</label>
+                    <select id="turno" [(ngModel)]="selectedTurnoUpdate" name="selectedturno" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <option value="" disabled>Seleccionar turno</option>
+                        <option *ngFor="let turno of turnos" [value]="turno.value">{{ turno.label }}</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" (click)="closeUpdateModal()"
+                    class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Cancelar
+                </button>
+                <button type="submit"
+                    class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Actualizar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Detalles -->
+<div *ngIf="isModalDetallesOpen" class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-auto overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 bg-blue-600">
+            <h3 class="text-lg font-medium text-white">Detalles del Curso: {{ cursoSeleccionado?.nombre }}</h3>
+            <button (click)="closeModalDetalles()" class="text-white hover:text-gray-200">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <div class="mb-4 flex justify-between items-center">
+                <div>
+                    <h4 class="text-lg font-medium text-gray-900">Turno: {{ cursoSeleccionado?.turno }}</h4>
+                </div>
+                <button (click)="openModalMaterias(cursoSeleccionado)" 
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Asignar Nueva Materia
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Materia
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Docente
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Horarios
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr *ngFor="let materia of detallesMaterias">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ materia.nombre }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm" [ngClass]="{
+                                    'text-gray-900': materia.estado === 'asignado',
+                                    'text-yellow-600': materia.estado === 'procesando',
+                                    'text-gray-500': materia.estado === 'sin_asignar'
+                                }">
+                                    <span *ngIf="materia.estado === 'procesando'" class="flex items-center">
+                                        {{ materia.docente_nombre }}
+                                        <svg class="animate-spin ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </span>
+                                    <span *ngIf="materia.estado !== 'procesando'">
+                                        {{ materia.docente_nombre }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    <span *ngFor="let horario of materia.horarios; let last = last">
+                                        {{ horario.dia_semana }} - {{ horario.dia }} {{ horario.hora_inicio }}-{{ horario.hora_fin }}{{ !last ? ', ' : '' }}
+                                    </span>
+                                    <span *ngIf="!materia.horarios?.length">No asignados</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <button (click)="openModalDocente(materia)" 
+                                            class="text-blue-600 hover:text-blue-900 mr-2"
+                                            title="Asignar Docente">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                                        </svg>
+                                    </button>
+                                    <button (click)="openModalHorarios(materia)" 
+                                            class="text-green-600 hover:text-green-900 mr-2"
+                                            title="Asignar Horarios">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </button>
+                                    <button (click)="openModalEditarDetalle(materia)" 
+                                            class="text-blue-600 hover:text-blue-900 mr-2"
+                                            title="Editar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button (click)="eliminarMateria(materia)" 
+                                            class="text-red-600 hover:text-red-900"
+                                            title="Eliminar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="!detallesMaterias?.length">
+                            <td colspan="4" class="px-6 py-8 text-center">
+                                <div class="text-gray-500">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">No hay materias asignadas</h3>
+                                    <p class="mt-1 text-sm text-gray-500">Comience asignando materias a este curso.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Edición de Detalles -->
+<div *ngIf="isModalEditDetallesOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 bg-blue-600">
+            <h3 class="text-lg font-medium text-white">Editar Detalles de Materia</h3>
+            <button (click)="closeModalEditarDetalle()" class="text-white hover:text-gray-200">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <form (submit)="guardarEdicionDetalle()">
+                <!-- Docente -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Docente
+                    </label>
+                    <select [(ngModel)]="docenteSeleccionado" 
+                            name="docente"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <option [ngValue]="null">Seleccione un docente</option>
+                        <option *ngFor="let docente of docentes" [value]="docente.id">
+                            {{ docente.first_name }} {{ docente.last_name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Horarios -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Horarios
+                    </label>
+                    <div class="space-y-2 max-h-48 overflow-y-auto">
+                        <div *ngFor="let horario of horarios" class="flex items-center">
+                            <input type="checkbox"
+                                   [value]="horario.id"
+                                   [checked]="horariosSeleccionados.includes(horario.id)"
+                                   (change)="onHorarioCheckboxChange($event)"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label class="ml-2 block text-sm text-gray-900">
+                                {{ horario.dia_semana }} - {{ horario.dia }} {{ horario.hora_inicio }}-{{ horario.hora_fin }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" 
+                            (click)="closeModalEditarDetalle()"
+                            class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Asignar Materias -->
+<div *ngIf="modalMateriasVisible" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 bg-blue-600">
+            <h3 class="text-lg font-medium text-white">Asignar Materias al Curso</h3>
+            <button (click)="closeModalMaterias()" class="text-white hover:text-gray-200">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <form (submit)="submitAsignarMaterias()">
+                <div class="space-y-4">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Seleccione las materias a asignar
+                        </label>
+                        <div class="space-y-2 max-h-60 overflow-y-auto border rounded-md p-3">
+                            <div *ngFor="let materia of materias" class="flex items-center">
+                                <input type="checkbox"
+                                       [value]="materia.id"
+                                       [checked]="materiasSeleccionadas.includes(materia.id)"
+                                       (change)="onMateriaCheckboxChange($event)"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label class="ml-2 block text-sm text-gray-900">
+                                    {{ materia.nombre }}
+                                </label>
+                            </div>
+                            <div *ngIf="!materias.length" class="text-sm text-gray-500 text-center py-2">
+                                No hay materias disponibles
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3">
+                        <button type="button"
+                                (click)="closeModalMaterias()"
+                                class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                                [disabled]="!materiasSeleccionadas.length"
+                                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Asignar Materias
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para asignar docente -->
+<div *ngIf="modalDocenteVisible" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 bg-blue-600">
+            <h3 class="text-lg font-medium text-white">Asignar Docente</h3>
+            <button (click)="closeModalDocente()" class="text-white hover:text-gray-200">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <form (submit)="submitAsignarDocente()">
+                <div class="space-y-4">
+                    <div class="mb-4">
+                        <label for="docente" class="block text-sm font-medium text-gray-700 mb-2">
+                            Seleccione el Docente
+                        </label>
+                        <select id="docente" 
+                                (change)="onDocenteChange($event)"
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option value="">Seleccione un docente</option>
+                            <option *ngFor="let docente of docentes" [value]="docente.id">
+                                {{docente.first_name}} {{docente.last_name}}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end space-x-3">
+                        <button type="button"
+                                (click)="closeModalDocente()"
+                                class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                                [disabled]="!selectedDocenteId"
+                                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Asignar Docente
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para asignar horarios -->
+<div *ngIf="modalHorariosVisible" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 bg-blue-600">
+            <h3 class="text-lg font-medium text-white">Asignar Horarios</h3>
+            <button (click)="closeModalHorarios()" class="text-white hover:text-gray-200">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <form (submit)="submitAsignarHorarios()">
+                <div class="space-y-4">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Seleccione los horarios
+                        </label>
+                        <div class="space-y-2 max-h-60 overflow-y-auto border rounded-md p-3">
+                            <div *ngFor="let horario of horarios" class="flex items-center">
+                                <input type="checkbox"
+                                       [value]="horario.id"
+                                       [checked]="horariosSeleccionados.includes(horario.id)"
+                                       [disabled]="isHorarioOcupado(horario.id)"
+                                       (change)="onHorarioCheckboxChange($event)"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                       [ngClass]="{'opacity-50 cursor-not-allowed': isHorarioOcupado(horario.id)}">
+                                <label class="ml-2 block text-sm" 
+                                       [ngClass]="{
+                                         'text-gray-900': !isHorarioOcupado(horario.id),
+                                         'text-gray-400 line-through': isHorarioOcupado(horario.id)
+                                       }">
+                                    {{ horario.dia_semana }} - {{ horario.dia }} {{ horario.hora_inicio }}-{{ horario.hora_fin }}
+                                    <span *ngIf="isHorarioOcupado(horario.id)" class="ml-2 text-xs text-red-500">
+                                        (Ocupado)
+                                    </span>
+                                </label>
+                            </div>
+                            <div *ngIf="!horarios.length" class="text-sm text-gray-500 text-center py-2">
+                                No hay horarios disponibles
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3">
+                        <button type="button"
+                                (click)="closeModalHorarios()"
+                                class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                                [disabled]="!horariosSeleccionados.length"
+                                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Asignar Horarios
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

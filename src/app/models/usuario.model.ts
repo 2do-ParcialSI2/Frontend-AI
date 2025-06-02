@@ -1,24 +1,9 @@
 export interface Usuario {
-    id: number;
-    nombre_completo: string;
-    email: string;
-    telefono: string;
-    direccion: string;
-    estado: boolean;
-    rol: {
-      id: number;
-      nombre: string;
-    };
-  }
-  
-export interface UsuarioDTO {
-  nombre: string;
-  apellido: string;
   email: string;
+  first_name: string;
+  last_name: string;
+  genero: 'M' | 'F';
+  activo: boolean;
+  roles: number[];
   password: string;
-  telefono: string;
-  direccion: string;
-  rolid: number;
 }
-
-  

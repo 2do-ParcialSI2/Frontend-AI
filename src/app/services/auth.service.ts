@@ -7,30 +7,23 @@ import { environment } from '../enviroment';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl   //url base del backend  private apiUrl = 'http://localhost:8080/mrp/auth';
+  private apiUrl = environment.apiUrl
 
   constructor(private http: HttpClient) { }
 
   login(email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}auth/login`, { email, password });
+    return this.http.post<any>(`${this.apiUrl}login/`, { email, password });
   }
-  
- // Método de registro (NUEVO)
-// En auth.service.ts
-registroAdmin(nombre: string, apellido: string, telefono: string, email: string, password: string) {
-  const usuarioDTO = {
-    nombre,
-    apellido,
-    telefono,
-    email,
-    password
-  };
-  
-  return this.http.post<any>(`${this.apiUrl}auth/registerAdmin`, usuarioDTO);
-}
+
+  registroAdmin(email: string, password: string) {
+    const usuarioDTO = {
+      email,
+      password
+    };
+
+    return this.http.post<any>(`${this.apiUrl}crear-admin/`, usuarioDTO);
+  }
   private token: string | null = null;
-
-
 
   guardarToken(token: string) {
     this.token = token;
@@ -41,9 +34,11 @@ registroAdmin(nombre: string, apellido: string, telefono: string, email: string,
     return this.token || localStorage.getItem('token');
   }
 
-
-  cerrarSesion() {
+  logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('nombre');
+    localStorage.removeItem('email');
+    localStorage.removeItem('userId');
   }
 
   guardarDatosUsuario(nombre: string, email: string) {
@@ -51,14 +46,10 @@ registroAdmin(nombre: string, apellido: string, telefono: string, email: string,
     localStorage.setItem('email', email);
   }
 
-  obtenerNombre(): string {
-    return localStorage.getItem('nombre') || '';
-  }
-
   obtenerEmail(): string {
     return localStorage.getItem('email') || '';
   }
-  
+
   obtenerUsuarioId(): number {
     return Number(localStorage.getItem('userId')) || 1; // Valor por defecto 1 si no está establecido
   }

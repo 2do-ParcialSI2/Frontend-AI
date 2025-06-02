@@ -20,7 +20,7 @@ export class RolComponent implements OnInit {
   mostrarModalNuevoRol: boolean = false;
   mostrarModalEditarRol: boolean = false;
 
-  constructor(private roleService: RoleService) {}
+  constructor(private roleService: RoleService) { }
 
   ngOnInit(): void {
     this.cargarRoles();
@@ -35,7 +35,7 @@ export class RolComponent implements OnInit {
       }
     });
 
-    this.roleService.getRoles().subscribe({
+    this.roleService.getRols().subscribe({
       next: (roles) => {
         this.roles = roles;
         Swal.close();
@@ -78,7 +78,7 @@ export class RolComponent implements OnInit {
       }
     });
 
-    this.roleService.createRole(this.nuevoRol).subscribe({
+    this.roleService.registerRol(this.nuevoRol).subscribe({
       next: (resultado) => {
         this.cargarRoles();
         this.cerrarModalNuevoRol();
@@ -130,7 +130,7 @@ export class RolComponent implements OnInit {
       }
     });
 
-    this.roleService.updateRole(this.rolEditando.id, this.nombreRolEditando).subscribe({
+    this.roleService.updateRol(this.rolEditando.id, this.nombreRolEditando).subscribe({
       next: (resultado) => {
         this.cargarRoles();
         this.cerrarModalEditarRol();
@@ -179,7 +179,7 @@ export class RolComponent implements OnInit {
       }
     });
 
-    this.roleService.deleteRole(rol.id).subscribe({
+    this.roleService.deleteRol(rol.id).subscribe({
       next: () => {
         this.cargarRoles();
         Swal.fire({

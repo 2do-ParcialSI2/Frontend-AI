@@ -1,71 +1,48 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 import Swal from 'sweetalert2'
-//import { error } from 'console';
-import { UserService } from '../../services/user.service';
-import { RoleService } from '../../services/rol.service';
+import { DocentesService } from '../../services/docentes.service';
 
 @Component({
-  selector: 'app-usuarios',
+  selector: 'app-docentes',
   standalone: true,
   imports: [FormsModule, CommonModule],
-  templateUrl: './usuario.component.html',
-  styleUrl: './usuario.component.css'
+  templateUrl: './docentes.component.html',
+  styleUrl: './docentes.component.css'
 })
-
-export class UsuarioComponent implements OnInit {
-  usersFiltrados: any[] = []; // visibles según filtro  
+export class DocentesComponent implements OnInit {
+  docentesFiltrados: any[] = []; // visibles según filtro  
   filtro: string = '';
-  isModalRegisterUserOpen: boolean = false;
-  isModalUpdateUserOpen: boolean = false;
+  isModalRegisterOpen: boolean = false;
+  isModalUpdateOpen: boolean = false;
   email = '';
   password = '';
   firstName = '';
   lastName = '';
   genero = '';
+  especialidad = '';
   activo = true; // puede cambiarse con checkbox
-  selectedRole = '';
-  roles: Array<any>;
-  users: any[] = [];
+  docentes: any[] = [];
   emailUpdate!: string;
   passwordUpdate: string = '';
   firstNameUpdate!: string;
   lastNameUpdate!: string;
   generoUpdate!: string;
+  especialidadUpdate!: string;
   activoUpdate: boolean = true;
-  roleUpdate!: number;
-  userIdSelected!: number;
+  idSelected!: number;
 
-
-  constructor(private userService: UserService, private roleService: RoleService) {
-    this.roles = [];
+  constructor(private docentesService: DocentesService) {
   }
 
   ngOnInit(): void {
-    this.getRoles();
-    this.getUsers();
-  }
-
-
-  getRoles() {
-    this.roleService.getRols().subscribe(
-      {
-        next: (resp: any) => {
-          console.log(resp);
-          this.roles = resp;
-        },
-        error: (error: any) => {
-          console.log(error);
-        }
-      }
-    );
+    this.getDocentes();
   }
 
   activeRegisterForm() {
     this.limpiarFormulario();
-    this.isModalRegisterUserOpen = true;
+    this.isModalRegisterOpen = true;
   }
 
   // Método para limpiar el formulario
@@ -76,12 +53,12 @@ export class UsuarioComponent implements OnInit {
     this.lastName = '';
     this.genero = '';
     this.activo = true;
-    this.selectedRole = '';
+    this.especialidad = '';
   }
 
-  // Método principal para registrar usuarios
-  registerUser() {
-    if (!this.password || !this.email || !this.selectedRole || !this.firstName || !this.lastName || !this.genero) {
+  // Método principal para registrar 
+  registerDocente() {
+    if (!this.password || !this.email || !this.especialidad || !this.firstName || !this.lastName || !this.genero) {
       Swal.fire({
         position: "center",
         icon: "error",
@@ -93,24 +70,24 @@ export class UsuarioComponent implements OnInit {
     }
 
     Swal.fire({
-      title: 'Registrando usuario...',
+      title: 'Registrando docente...',
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       }
     });
 
-    const user = {
+    const Data = {
       password: this.password,
       email: this.email,
       first_name: this.firstName,
       last_name: this.lastName,
       genero: this.genero,
       activo: this.activo,
-      roles: [parseInt(this.selectedRole)]
+      especialidad: this.especialidad,
     };
 
-    this.userService.registerUser(user).subscribe({
+    this.docentesService.registerDocente(Data).subscribe({
       next: (resp: any) => {
         console.log(resp);
         Swal.close();
@@ -118,7 +95,7 @@ export class UsuarioComponent implements OnInit {
         const esExitoso = resp.id || (resp.data && resp.data.id) || resp.statusCode === 200 || resp.statusCode === 201;
 
         if (esExitoso) {
-          this.getUsers();
+          this.getDocentes();
           Swal.fire({
             position: "center",
             icon: "success",
@@ -130,24 +107,24 @@ export class UsuarioComponent implements OnInit {
           this.limpiarFormulario();
 
           setTimeout(() => {
-            this.closeRegisterUserModal();
+            this.closeRegisterModal();
           }, 2100);
         } else {
           Swal.fire({
             position: "center",
             icon: "error",
-            title: "Error al registrar el usuario",
+            title: "Error al registrar el docente",
             text: resp.message || "Verifica los datos ingresados",
             showConfirmButton: true
           });
         }
       },
       error: (error: any) => {
-        console.log('Error al registrar usuario:', error);
+        console.log('Error al registrar docente:', error);
         Swal.fire({
           position: "center",
           icon: "error",
-          title: "Error al registrar el usuario",
+          title: "Error al registrar el docente",
           text: error.error?.message || "Ocurrió un error en el servidor",
           showConfirmButton: true
         });
@@ -156,43 +133,44 @@ export class UsuarioComponent implements OnInit {
   }
 
 
-  getUsers(): void {
+  getDocentes(): void {
     // Mostrar SweetAlert de carga
     Swal.fire({
-      title: 'Cargando usuarios...',
+      title: 'Cargando docentes...',
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading()
     });
 
-    this.userService.getUsers().subscribe({
+    this.docentesService.getDocentes().subscribe({
       next: (resp: any) => {
+        console.log(resp)
         Swal.close(); // Cerrar la alerta de carga
 
-        let usuarios: any[] = [];
+        let docentes: any[] = [];
 
         // Verifica si la respuesta viene anidada (por ejemplo { data: [...] }) o es directamente un array
         if (resp && Array.isArray(resp)) {
-          usuarios = resp;
+          docentes = resp;
         } else if (resp && resp.data && Array.isArray(resp.data)) {
-          usuarios = resp.data;
+          docentes = resp.data;
         } else {
-          console.warn('Respuesta inesperada al obtener usuarios:', resp);
+          console.warn('Respuesta inesperada al obtener docentes:', resp);
           Swal.fire({
             icon: 'warning',
             title: 'Advertencia',
             text: 'El formato de la respuesta del servidor no es el esperado.'
           });
-          usuarios = [];
+          docentes = [];
         }
 
         // Asignar los datos a ambos arrays
-        this.users = usuarios;
-        this.usersFiltrados = [...usuarios];
+        this.docentes = docentes;
+        this.docentesFiltrados = [...docentes];
 
         // Feedback positivo si deseas
         Swal.fire({
           icon: 'success',
-          title: 'Usuarios cargados',
+          title: 'Docentes cargados',
           timer: 1000,
           showConfirmButton: false
         });
@@ -201,14 +179,13 @@ export class UsuarioComponent implements OnInit {
       error: (error: any) => {
         Swal.close();
 
-        console.error('Error al obtener usuarios:', error);
-        this.users = [];
-        this.usersFiltrados = [];
+        console.error('Error al obtener docentes:', error);
+        this.docentesFiltrados = [];
 
         Swal.fire({
           icon: 'error',
           title: 'Error al cargar',
-          text: 'No se pudieron cargar los usuarios. Por favor, intente nuevamente.'
+          text: 'No se pudieron cargar los docentes. Por favor, intente nuevamente.'
         });
       }
     });
@@ -220,67 +197,67 @@ export class UsuarioComponent implements OnInit {
     return 'No especificado';
   }
 
-  buscarUsuarios(): void {
+  buscarDocentes(): void {
     const termino = this.filtro.trim().toLowerCase();
     if (termino === '') {
-      this.usersFiltrados = this.users;
+      this.docentesFiltrados = this.docentes;
     } else {
-      this.usersFiltrados = this.users.filter(sub =>
+      this.docentesFiltrados = this.docentes.filter(sub =>
         sub.nombre.toLowerCase().includes(termino)
       );
     }
   }
 
-  openModalToUpdateUser(user: any) {
-    this.isModalUpdateUserOpen = true;
+  openModalToUpdate(docente: any) {
+    this.isModalUpdateOpen = true;
     this.passwordUpdate = '';
-    this.emailUpdate = user.email;
-    this.firstNameUpdate = user.first_name;
-    this.lastNameUpdate = user.last_name;
-    this.generoUpdate = user.genero;
-    this.activoUpdate = user.activo;
-    this.roleUpdate = user.rol?.id;
-    this.userIdSelected = user.id;
+    this.emailUpdate = docente.email;
+    this.firstNameUpdate = docente.first_name;
+    this.lastNameUpdate = docente.last_name;
+    this.generoUpdate = docente.genero;
+    this.especialidadUpdate = docente.especialidad;
+    this.activoUpdate = docente.activo;
+    this.idSelected = docente.id;
   }
 
-  actualizarUsuario() {
+  actualizarDocente() {
     Swal.fire({
-      title: 'Actualizando usuario...',
+      title: 'Actualizando docente...',
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       }
     });
 
-    let userData: any = {
+    let Data: any = {
       email: this.emailUpdate,
       first_name: this.firstNameUpdate,
       last_name: this.lastNameUpdate,
       genero: this.generoUpdate,
       activo: this.activoUpdate,
-      roles: [this.roleUpdate]
+      especialidad: this.especialidadUpdate
     };
 
     if (this.passwordUpdate && this.passwordUpdate.trim() !== '') {
-      userData.password = this.passwordUpdate;
+      Data.password = this.passwordUpdate;
     }
 
-    console.log('Datos de actualización:', userData);
+    console.log('Datos de actualización:', Data);
 
-    this.userService.updateUser(this.userIdSelected, userData).subscribe(
+    this.docentesService.updateDocente(this.idSelected, Data).subscribe(
       {
         next: (resp: any) => {
+          this.getDocentes();
           Swal.close();
-          this.getUsers();
           Swal.fire({
             position: "center",
             icon: "success",
-            title: "Usuario actualizado correctamente",
+            title: "Docente actualizado correctamente",
             showConfirmButton: false,
             timer: 2000
           });
           setTimeout(() => {
-            this.closeUpdateUserModal();
+            this.closeUpdateModal();
           }, 2100);
         },
         error: (error: any) => {
@@ -288,7 +265,7 @@ export class UsuarioComponent implements OnInit {
           Swal.fire({
             position: "center",
             icon: "error",
-            title: "Error al actualizar el usuario",
+            title: "Error al actualizar al docente",
             text: error.error?.message || "Ocurrió un error en el servidor",
             showConfirmButton: true
           });
@@ -298,11 +275,11 @@ export class UsuarioComponent implements OnInit {
   }
 
 
-  deleteUser(user: any) {
+  deleteDocente(docente: any) {
     // Confirmación antes de eliminar
     Swal.fire({
       title: '¿Estás seguro?',
-      text: `¿Deseas eliminar al usuario ${user.nombre}?`,
+      text: `¿Deseas eliminar al docente ${docente.nombre}?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -313,24 +290,21 @@ export class UsuarioComponent implements OnInit {
       if (result.isConfirmed) {
         // Mostrar indicador de carga
         Swal.fire({
-          title: 'Eliminando usuario...',
+          title: 'Eliminando al docente...',
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
           }
         });
 
-        this.userService.deleteUser(user.id).subscribe({
+        this.docentesService.deleteDocente(docente.id).subscribe({
           next: (resp: any) => {
             console.log(resp);
-
-            // Actualizar la lista de usuarios primero
-            this.getUsers();
-
+            this.getDocentes();
             Swal.fire({
               position: "center",
               icon: "success",
-              title: "Usuario eliminado correctamente",
+              title: "Docente eliminado correctamente",
               showConfirmButton: false,
               timer: 2000
             });
@@ -341,7 +315,7 @@ export class UsuarioComponent implements OnInit {
             Swal.fire({
               position: "center",
               icon: "error",
-              title: "Error al eliminar el usuario",
+              title: "Error al eliminar al docente",
               text: error.error?.message || "Ocurrió un error en el servidor",
               showConfirmButton: true
             });
@@ -351,17 +325,11 @@ export class UsuarioComponent implements OnInit {
     });
   }
 
-  updateRoleId($event: any) {
-    this.roleUpdate = $event;
-    console.log(this.roleUpdate);
-    console.log($event);
+  closeRegisterModal() {
+    this.isModalRegisterOpen = false;
   }
 
-  closeRegisterUserModal() {
-    this.isModalRegisterUserOpen = false;
-  }
-
-  closeUpdateUserModal() {
-    this.isModalUpdateUserOpen = false;
+  closeUpdateModal() {
+    this.isModalUpdateOpen = false;
   }
 }
