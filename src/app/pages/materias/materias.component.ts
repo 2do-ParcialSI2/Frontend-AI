@@ -7,6 +7,7 @@ import { CursosService } from '../../services/cursos.service';
 import { PadresTutoresService } from '../../services/padres-tutores.service';
 import { MatriculaService } from '../../services/matricula.service';
 import { MateriasService } from '../../services/materias.service';
+import { HorariosService } from '../../services/horarios.service';
 
 @Component({
   selector: 'app-materias',
@@ -27,8 +28,10 @@ export class MateriasComponent implements OnInit {
   descripcionUpdate!: string;
   idSelected!: number;
 
-  constructor(private materiaService: MateriasService) {
-  }
+  constructor(
+    private materiaService: MateriasService,
+    private horarioService: HorariosService
+  ) { }
 
   ngOnInit(): void {
     this.getAll();
@@ -116,8 +119,58 @@ export class MateriasComponent implements OnInit {
     });
   }
 
+  async obtenerCursosAsignados(materias: any[]): Promise<void> {
+    for (const materia of materias) {
+      try {
+        const horarios = await this.horarioService.getPorMateria(materia.id, {}).toPromise();
+        console.log(`Horarios completos para materia ${materia.id}:`, JSON.stringify(horarios, null, 2));
+
+        // Crear un Map para agrupar los horarios por curso
+        const cursoHorarios = new Map();
+
+        if (Array.isArray(horarios)) {
+          horarios.forEach((h: any) => {
+            console.log(`Procesando horario:`, JSON.stringify(h, null, 2));
+
+            if (!cursoHorarios.has(h.curso)) {
+              cursoHorarios.set(h.curso, new Set());
+            }
+
+            // Usar el campo 'dia' en lugar de 'dia_semana'
+            const diaFormateado = h.dia || 'Sin día';
+            const horaInicio = h.hora_inicio || '00:00';
+            const horaFin = h.hora_fin || '00:00';
+
+            console.log('Valores formateados:', {
+              diaFormateado,
+              horaInicio,
+              horaFin,
+              curso: h.curso
+            });
+
+            cursoHorarios.get(h.curso).add(`${diaFormateado} ${horaInicio}-${horaFin}`);
+          });
+        } else {
+          console.warn(`Los horarios para la materia ${materia.id} no son un array:`, horarios);
+        }
+
+        // Convertir el Map a un array de strings formateados
+        const cursosConHorarios = Array.from(cursoHorarios.entries()).map(([curso, horarios]) => {
+          const horariosArray = Array.from(horarios as Set<string>);
+          return `${curso} (${horariosArray.join(', ')})`;
+        });
+
+        materia.cursos_asignados = cursosConHorarios.length > 0 ? cursosConHorarios.join(' | ') : 'Sin cursos asignados';
+        console.log(`Cursos asignados para materia ${materia.id}:`, materia.cursos_asignados);
+
+      } catch (error) {
+        console.error(`Error al obtener horarios para materia ${materia.id}:`, error);
+        materia.cursos_asignados = 'Sin cursos asignados';
+      }
+    }
+  }
+
   getAll(): void {
-    // Mostrar SweetAlert de carga
     Swal.fire({
       title: 'Cargando data...',
       allowOutsideClick: false,
@@ -125,13 +178,9 @@ export class MateriasComponent implements OnInit {
     });
 
     this.materiaService.getAll().subscribe({
-      next: (resp: any) => {
-        console.log(resp)
-        Swal.close(); // Cerrar la alerta de carga
-
+      next: async (resp: any) => {
         let materias: any[] = [];
 
-        // Verifica si la respuesta viene anidada (por ejemplo { data: [...] }) o es directamente un array
         if (resp && Array.isArray(resp)) {
           materias = resp;
         } else if (resp && resp.data && Array.isArray(resp.data)) {
@@ -146,11 +195,12 @@ export class MateriasComponent implements OnInit {
           materias = [];
         }
 
-        // Asignar los datos a ambos arrays
+        // Obtener los cursos asignados
+        await this.obtenerCursosAsignados(materias);
+
         this.materias = materias;
         this.Filtrados = [...materias];
 
-        // Feedback positivo si deseas
         Swal.fire({
           icon: 'success',
           title: 'Información cargada correctamente',
@@ -158,13 +208,10 @@ export class MateriasComponent implements OnInit {
           showConfirmButton: false
         });
       },
-
       error: (error: any) => {
         Swal.close();
-
-        console.error('Error al obtener la  data:', error);
+        console.error('Error al obtener la data:', error);
         this.Filtrados = [];
-
         Swal.fire({
           icon: 'error',
           title: 'Error al cargar',

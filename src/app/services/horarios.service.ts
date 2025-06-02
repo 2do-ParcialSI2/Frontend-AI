@@ -36,11 +36,13 @@ export class HorariosService {
     return this.http.get(this.apiUrl + `dias-semana/${id}/`, horario);
   }
 
-  getPorDia(id: number, horario: any): Observable<any> {
-    return this.http.get(this.apiUrl + `por-dia/${id}/`, horario);
+  getPorDia(dia: string): Observable<any> {
+    const url = `${this.apiUrl}por-dia/${dia}`;
+    console.log('URL de getPorDia:', url);
+    return this.http.get(url);
   }
 
   getPorMateria(id: number, materia: any): Observable<any> {
-    return this.http.get(this.apiUrl + `/por-materia/${id}/`, materia);
+    return this.http.get(this.apiUrl + `por-materia/${id}/`, materia);
   }
 }

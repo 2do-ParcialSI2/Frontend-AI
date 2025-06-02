@@ -40,6 +40,7 @@
                         <th scope="col" class="px-6 py-3">ID</th>
                         <th scope="col" class="px-6 py-3">Nombre</th>
                         <th scope="col" class="px-6 py-3">Descripción</th>
+                        <th scope="col" class="px-6 py-3">Cursos Asignados</th>
                         <th scope="col" class="px-6 py-3">Acciones</th>
                     </tr>
                 </thead>
@@ -48,7 +49,7 @@
                         <td class="p-2 border">{{ usuario.id }}</td>
                         <td class="p-2 border">{{ usuario.nombre }}</td>
                         <td class="p-2 border">{{ usuario.descripcion }}</td>
-
+                        <td class="p-2 border">{{ usuario.cursos_asignados }}</td>
                         <td class="p-2 border">
                             <div class="flex space-x-2">
                                 <button (click)="openModalToUpdate(usuario)" class="text-blue-600 hover:text-blue-900"
@@ -169,8 +170,10 @@
                         required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" />
                 </div>
-            </div>
 
+            </div>
+            <div><label class="text-sm font-medium text-gray-700">Para asignar los cursos y horarios, se debe ir a
+                    la pestaña de "Cursos"</label></div>
             <div class="mt-6 flex justify-end space-x-3">
                 <button type="button" (click)="closeUpdateModal()"
                     class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
