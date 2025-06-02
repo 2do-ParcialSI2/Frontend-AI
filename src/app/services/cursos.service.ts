@@ -39,6 +39,10 @@ export class CursosService {
     return this.http.post(this.apiUrl + 'cursos/', curso);
   }
 
+  getCursos(): Observable<any> {
+    return this.http.get(this.apiUrl + 'cursos/');
+  }
+
   getAll(): Observable<any> {
     return this.http.get(this.apiUrl + 'cursos/').pipe(
       map(cursos => {

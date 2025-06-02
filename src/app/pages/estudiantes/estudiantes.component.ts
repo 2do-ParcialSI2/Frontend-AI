@@ -257,7 +257,7 @@ export class EstudiantesComponent implements OnInit {
   }
 
   getCursos(): void {
-    this.cursosServices.getAll().subscribe({
+    this.cursosServices.getCursos().subscribe({
       next: (resp: any) => {
         console.log(resp)
         let cursos: any[] = [];
@@ -279,7 +279,7 @@ export class EstudiantesComponent implements OnInit {
 
         // Asignar los datos
         this.cursos = cursos;
-
+        console.log(this.cursos);
         // Feedback positivo si deseas
         Swal.fire({
           icon: 'success',
