@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { environment } from '../enviroment';
 import { AuthService } from './auth.service';
 
@@ -275,5 +275,73 @@ export class SeguimientoService {
   // 7. VERIFICACIÓN
   verificarMatricula(estudianteId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}verificar-matricula/${estudianteId}/`);
+  }
+
+  createSeguimientosPorTrimestre(estudiante_id: number, materia_curso_id: number): Observable<any> {
+    // Crear array de promesas para los 3 trimestres
+    const seguimientos = [1, 2, 3].map(trimestre => {
+      const data = {
+        materia_curso: materia_curso_id,
+        trimestre: trimestre,
+        estudiante: estudiante_id
+      };
+      console.log(`Creando seguimiento para trimestre ${trimestre}:`, data);
+      return this.http.post(`${this.apiUrl}/seguimientos/`, data);
+    });
+
+    // Retornar un observable que emite cuando todos los seguimientos son creados
+    return forkJoin(seguimientos);
+  }
+
+  async validarSeguimientoParaMateria(seguimientos: any[], materiaActual: any, trimestreActual: number): Promise<number | null> {
+    console.log('Validando seguimiento para materia:', {
+      seguimientos,
+      materiaActual,
+      trimestreActual
+    });
+
+    if (!seguimientos || !materiaActual || !materiaActual.nombre || !trimestreActual) {
+      console.log('Datos insuficientes para validar seguimiento');
+      return null;
+    }
+
+    // Buscar el seguimiento correcto (misma materia y mismo trimestre)
+    for (const seg of seguimientos) {
+      console.log('Analizando seguimiento:', seg);
+      if (seg.materia_nombre && materiaActual.nombre) {
+        const coincideMateria = seg.materia_nombre.toLowerCase().trim() === materiaActual.nombre.toLowerCase().trim();
+        const coincideTrimestre = this.obtenerNumeroTrimestre(seg.trimestre_nombre) === trimestreActual;
+
+        console.log('Comparando:', {
+          'seguimiento_materia': seg.materia_nombre,
+          'materia_actual': materiaActual.nombre,
+          'coincide_materia': coincideMateria,
+          'trimestre_seguimiento': seg.trimestre_nombre,
+          'trimestre_actual': trimestreActual,
+          'coincide_trimestre': coincideTrimestre
+        });
+
+        if (coincideMateria && coincideTrimestre) {
+          console.log('Seguimiento encontrado:', seg);
+          return seg.id;
+        }
+      }
+    }
+
+    console.log('No se encontró seguimiento para la materia y trimestre:', {
+      materia: materiaActual.nombre,
+      trimestre: trimestreActual
+    });
+    return null;
+  }
+
+  private obtenerNumeroTrimestre(nombreTrimestre: string): number {
+    if (!nombreTrimestre) return 0;
+
+    const trimestre = nombreTrimestre.toLowerCase().trim();
+    if (trimestre.includes('primer')) return 1;
+    if (trimestre.includes('segundo')) return 2;
+    if (trimestre.includes('tercer')) return 3;
+    return 0;
   }
 }

@@ -110,8 +110,7 @@ export class SeguimientoComponent implements OnInit {
   onCursoChange(): void {
     if (this.cursoSeleccionado) {
       this.cargarMateriasDelCurso();
-      this.trimestreSeleccionada = null;
-      this.estudiantes = [];
+      this.cargarEstudiantes();
     }
   }
 
@@ -186,11 +185,11 @@ export class SeguimientoComponent implements OnInit {
   }
 
   async toggleSeguimiento(estudiante: Estudiante): Promise<void> {
-    if (!this.trimestreSeleccionada || !this.cursoSeleccionado || this.materiasCursoIds.length === 0) {
+    if (!this.cursoSeleccionado || this.materiasCursoIds.length === 0) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Por favor, seleccione un curso, un trimestre y espere a que se carguen las materias'
+        text: 'Por favor, seleccione un curso y espere a que se carguen las materias'
       });
       return;
     }
@@ -205,13 +204,19 @@ export class SeguimientoComponent implements OnInit {
         }
       });
 
-      const promesasSeguimientos = this.materiasCursoIds.map(materiaId =>
-        firstValueFrom(this.seguimientoService.createSeguimiento({
-          materia_curso: materiaId,
-          trimestre: this.trimestreSeleccionada!,
-          estudiante: estudiante.id
-        }))
-      );
+      // Crear seguimientos para cada materia y cada trimestre
+      const promesasSeguimientos = [];
+      for (const materiaId of this.materiasCursoIds) {
+        for (let trimestre = 1; trimestre <= 3; trimestre++) {
+          promesasSeguimientos.push(
+            firstValueFrom(this.seguimientoService.createSeguimiento({
+              materia_curso: materiaId,
+              trimestre: trimestre,
+              estudiante: estudiante.id
+            }))
+          );
+        }
+      }
 
       await Promise.all(promesasSeguimientos);
 

@@ -32,6 +32,7 @@ export class ParticipacionesComponent implements OnInit {
   cargandoEstudiantes: boolean = false;
   registrandoParticipaciones: boolean = false;
   seguimientosMap: Map<number, number> = new Map();
+  trimestreSeleccionado: number = 1; // Por defecto primer trimestre
 
   constructor(
     private seguimientoService: SeguimientoService,
@@ -225,7 +226,7 @@ export class ParticipacionesComponent implements OnInit {
   }
 
   async registrarParticipaciones(): Promise<void> {
-    if (!this.materiaSeleccionada || !this.estudiantes.length || !this.fechaSeleccionada) {
+    if (!this.materiaSeleccionada || !this.estudiantes.length || !this.fechaSeleccionada || !this.trimestreSeleccionado) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -243,9 +244,6 @@ export class ParticipacionesComponent implements OnInit {
           Swal.showLoading();
         }
       });
-
-      // Crear mapa de seguimientos para cada estudiante
-      const seguimientosMap = new Map();
 
       // Obtener la materia actual
       const materiaActual = this.materiasDelCurso.find(m => Number(m.id) === Number(this.materiaSeleccionada));
@@ -265,6 +263,9 @@ export class ParticipacionesComponent implements OnInit {
 
       console.log('Materia actual encontrada:', materiaActual);
 
+      // Crear mapa de seguimientos para cada estudiante
+      const seguimientosMap = new Map();
+
       // Obtener seguimientos para cada estudiante
       for (const estudiante of this.estudiantes) {
         console.log('Procesando estudiante:', estudiante.nombre);
@@ -272,52 +273,50 @@ export class ParticipacionesComponent implements OnInit {
         const seguimientos = await firstValueFrom(this.seguimientoService.getSeguimientosPorEstudiante(estudiante.id));
         console.log('Seguimientos obtenidos para', estudiante.nombre, ':', seguimientos);
 
-        // Intentar encontrar el seguimiento correcto
-        let seguimientoEncontrado = null;
-        for (const seg of seguimientos) {
-          console.log('Analizando seguimiento:', seg);
-          if (seg.materia_nombre && materiaActual.nombre) {
-            console.log('Comparando:', {
-              'seguimiento_materia': seg.materia_nombre,
-              'materia_actual': materiaActual.nombre,
-              'coinciden': seg.materia_nombre.toLowerCase().trim() === materiaActual.nombre.toLowerCase().trim()
-            });
-            if (seg.materia_nombre.toLowerCase().trim() === materiaActual.nombre.toLowerCase().trim()) {
-              seguimientoEncontrado = seg;
-              break;
-            }
-          }
-        }
+        // Validar seguimiento usando el nuevo método
+        const seguimientoId = await this.seguimientoService.validarSeguimientoParaMateria(
+          seguimientos,
+          materiaActual,
+          this.trimestreSeleccionado
+        );
 
-        if (seguimientoEncontrado) {
-          console.log('Seguimiento encontrado:', seguimientoEncontrado);
-          seguimientosMap.set(estudiante.id, seguimientoEncontrado.id);
-        } else {
-          console.log('No se encontró seguimiento para la materia:', materiaActual.nombre);
+        if (seguimientoId) {
+          seguimientosMap.set(estudiante.id, seguimientoId);
         }
       }
 
-      // Verificar que todos los estudiantes tengan seguimiento para esta materia
-      const estudiantesSinSeguimiento = this.estudiantes.filter(est => !seguimientosMap.has(est.id));
+      // Verificar que todos los estudiantes tengan seguimiento para esta materia y trimestre
+      const estudiantesSinSeguimiento = this.estudiantes
+        .filter(est => est.participacion)
+        .filter(est => !seguimientosMap.has(est.id));
+
       if (estudiantesSinSeguimiento.length > 0) {
-        throw new Error(`Los siguientes estudiantes no tienen seguimiento activo para esta materia: ${estudiantesSinSeguimiento.map(e => e.nombre).join(', ')}`);
+        throw new Error(`Los siguientes estudiantes no tienen seguimiento activo para esta materia en el trimestre ${this.trimestreSeleccionado}: ${estudiantesSinSeguimiento.map(e => e.nombre).join(', ')}`);
       }
 
-      // Registrar participaciones solo para estudiantes que participaron
+      // Registrar participaciones solo para estudiantes que participaron y tienen seguimiento
       const promesasParticipaciones = this.estudiantes
         .filter(est => est.participacion)
         .map(async estudiante => {
           const seguimientoId = seguimientosMap.get(estudiante.id);
           if (!seguimientoId) {
-            throw new Error(`No se encontró seguimiento para el estudiante ${estudiante.nombre}`);
+            throw new Error(`No se encontró seguimiento para el estudiante ${estudiante.nombre} en el trimestre ${this.trimestreSeleccionado}`);
           }
 
-          return firstValueFrom(this.seguimientoService.createParticipacion({
+          const participacionData = {
             seguimiento: seguimientoId,
             fecha_participacion: this.fechaSeleccionada,
-            nota_participacion: 1, // Valor por defecto para participación
+            nota_participacion: 1,
             descripcion: estudiante.descripcion || ''
-          }));
+          };
+
+          console.log('Datos de la participación a registrar:', {
+            estudiante: estudiante.nombre,
+            trimestre: this.trimestreSeleccionado,
+            participacionData
+          });
+
+          return firstValueFrom(this.seguimientoService.createParticipacion(participacionData));
         });
 
       await Promise.all(promesasParticipaciones);

@@ -39,6 +39,16 @@
             </div>
         </div>
 
+        <!-- Selector de trimestre -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Trimestre</label>
+            <select [(ngModel)]="trimestreSeleccionado" class="w-full p-2 border rounded-md">
+                <option [ngValue]="1">Primer Trimestre</option>
+                <option [ngValue]="2">Segundo Trimestre</option>
+                <option [ngValue]="3">Tercer Trimestre</option>
+            </select>
+        </div>
+
         <!-- Descripción de la tarea -->
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-2">Descripción de la Tarea</label>
@@ -59,10 +69,10 @@
                     Marcar todos entregados
                 </button>
             </div>
-            <button (click)="verHistorialTareas()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            <!-- <button (click)="verHistorialTareas()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
                 [disabled]="!materiaSeleccionada">
                 Ver historial
-            </button>
+            </button> -->
         </div>
 
         <!-- Lista de estudiantes -->

@@ -316,7 +316,7 @@ export class AsistenciasComponent implements OnInit {
       });
 
     } catch (error: any) {
-      console.error('Error en el proceso:', error);
+      console.error('No se puede registrar asistencia para fechas futuras');
       this.registrandoAsistencias = false;
       Swal.fire({
         icon: 'error',
