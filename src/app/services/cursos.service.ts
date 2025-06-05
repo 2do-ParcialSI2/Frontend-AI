@@ -48,7 +48,7 @@ export class CursosService {
       map(cursos => {
         if (Array.isArray(cursos)) {
           // Para cada curso, obtenemos sus detalles con materias
-          const cursosConDetalles = cursos.map(curso => 
+          const cursosConDetalles = cursos.map(curso =>
             this.getMaterias(curso.id).pipe(
               map(detalles => ({
                 ...curso,
@@ -77,6 +77,18 @@ export class CursosService {
 
   getTurnos(): Observable<any> {
     return this.http.get(this.apiUrl + 'turnos/');
+  }
+
+  getTrimestres(): Observable<any> {
+    return this.http.get(this.apiUrl + 'trimestres/');
+  }
+
+  getCursosConEstudiantes(): Observable<any> {
+    return this.http.get(this.apiUrl + 'cursos-con-estudiantes/');
+  }
+
+  getIdCursosConEstudiantes(id: number): Observable<any> {
+    return this.http.get(this.apiUrl + `cursos-con-estudiantes/${id}/`);
   }
 
   getMaterias(cursoId: number): Observable<CursoMaterias> {
@@ -120,42 +132,22 @@ export class CursosService {
   modificarDetalles(cursoId: number, data: any) {
     return this.http.put(this.apiUrl + `asignar-materias/${cursoId}/`, data);
   }
-  /**{
-  "asignaciones": [
-    {
-      "materia_id": 0,
-      "docente_id": 0,
-      "horarios_ids": [
-        0
-      ]
-    }
-  ]
-} */
 
   editarMaterias(cursoId: number, data: any) {
     return this.http.patch(this.apiUrl + `asignar-materias/${cursoId}/`, data);
   }
 
-
   asignarMaterias(cursoId: number, materias_ids: number[]): Observable<any> {
     return this.http.post(this.apiUrl + `cursos/${cursoId}/asignar-materias/`, { materias_ids });
   }
-  /*   {
-     "materias_ids": [1, 2, 3]  // IDs de las materias que quieres asignar
-   } */
 
   asignarDocente(cursoId: number, materiaId: number, docenteId: number): Observable<any> {
     return this.http.post(this.apiUrl + `cursos/${cursoId}/asignar-docente/${materiaId}/`, { docente_id: docenteId });
-  }/**   {
-     "docente_id": 1  // ID del docente
-   } */
+  }
 
   asignarHorario(cursoId: number, materiaId: number, horarios_ids: number[]): Observable<any> {
     return this.http.post(this.apiUrl + `cursos/${cursoId}/asignar-horarios/${materiaId}/`, { horarios_ids });
   }
-  /**   {
-     "horarios_ids": [1, 2]  // IDs de los horarios para esa materia
-   } */
 
   deleteMateria(cursoId: number, materiaId: number): Observable<any> {
     return this.http.delete(this.apiUrl + `${cursoId}/eliminar-materia/${materiaId}/`);

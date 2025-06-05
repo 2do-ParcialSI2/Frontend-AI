@@ -5,6 +5,7 @@ import Swal from 'sweetalert2'
 import { EstudiantesService } from '../../services/estudiantes.service';
 import { CursosService } from '../../services/cursos.service';
 import { PadresTutoresService } from '../../services/padres-tutores.service';
+import { SeguimientoService } from '../../services/seguimiento.service';
 
 @Component({
   selector: 'app-estudiantes',
@@ -43,7 +44,7 @@ export class EstudiantesComponent implements OnInit {
   activoUpdate: boolean = true;
   idSelected!: number;
 
-  constructor(private estudiantesService: EstudiantesService, private cursosServices: CursosService, private tutoresService: PadresTutoresService) {
+  constructor(private estudiantesService: EstudiantesService, private cursosServices: CursosService, private tutoresService: PadresTutoresService, private seguimientoService: SeguimientoService) {
   }
 
   ngOnInit(): void {
@@ -108,7 +109,7 @@ export class EstudiantesComponent implements OnInit {
 
     this.estudiantesService.register(Data).subscribe({
       next: (resp: any) => {
-        console.log(resp);
+        console.log('estudiante', resp);
         Swal.close();
 
         const esExitoso = resp.id || (resp.data && resp.data.id) || resp.statusCode === 200 || resp.statusCode === 201;
@@ -124,6 +125,11 @@ export class EstudiantesComponent implements OnInit {
           });
 
           this.limpiarFormulario();
+          // this.seguimientoService.createSeguimiento({
+          //   materia_curso: 1,
+          //   trimestre: 1,
+          //   estudiante: resp.id
+          // });
 
           setTimeout(() => {
             this.closeRegisterModal();
