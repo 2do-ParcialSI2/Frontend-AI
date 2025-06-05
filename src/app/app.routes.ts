@@ -16,6 +16,7 @@ import { ParticipacionesComponent } from './pages/participaciones/participacione
 import { TareasComponent } from './pages/tareas/tareas.component';
 import { TiposExamenComponent } from './pages/tipos-examen/tipos-examen.component';
 import { SeguimientoComponent } from './pages/seguimiento/seguimiento.component';
+import { ResumenComponent } from './pages/resumen/resumen.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -35,6 +36,7 @@ export const routes: Routes = [
   { path: 'tareas', component: TareasComponent },
   { path: 'evaluaciones', component: ExamenesComponent },
   { path: 'seguimiento', component: SeguimientoComponent },
+  { path: 'resumen', component: ResumenComponent },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },  //inicio de sesion por defecto
   { path: '**', redirectTo: '/login/' },

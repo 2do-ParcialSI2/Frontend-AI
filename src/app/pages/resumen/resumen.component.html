@@ -1,0 +1,93 @@
+<div class="p-4 sm:ml-60 pt-20 bg-gray-50 min-h-screen">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Detalle de Notas</h1>
+        <p class="text-gray-600">De cada estudiante</p>
+
+        <!-- Selección de curso -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Curso</label>
+                <select [(ngModel)]="cursoSeleccionado" (ngModelChange)="onCursoChange()"
+                    class="w-full p-2 border rounded-md">
+                    <option [ngValue]="null">Seleccione un curso</option>
+                    <option *ngFor="let curso of cursos" [value]="curso.id">{{ curso.nombre }}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Lista de estudiantes -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200" *ngIf="estudiantes.length > 0">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Nombre
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Promedio Final
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Resumen
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <ng-container *ngFor="let estudiante of estudiantes">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-800">
+                                {{ estudiante.nombre }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-700">
+                                {{ estudiante.resumen?.promedio_general ?? 'Cargando...' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <button (click)="estudiante.mostrarResumen = !estudiante.mostrarResumen">
+                                    {{ estudiante.mostrarResumen ? 'Ocultar' : 'Ver Detalles' }}
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="estudiante.mostrarResumen">
+                            <td colspan="3" class="px-6 py-4 bg-gray-100">
+                                <div *ngIf="estudiante.resumen?.materias?.length > 0; else sinMaterias">
+                                    <table class="min-w-full text-sm text-left text-gray-700">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-4 py-2">Materia</th>
+                                                <th class="px-4 py-2">Trimestre</th>
+                                                <th class="px-4 py-2">Nota</th>
+                                                <th class="px-4 py-2">Asistencias</th>
+                                                <th class="px-4 py-2">Tareas</th>
+                                                <th class="px-4 py-2">Participaciones</th>
+                                                <th class="px-4 py-2">Exámenes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let mat of estudiante.resumen.materias">
+                                                <td class="px-4 py-2">{{ mat.materia }}</td>
+                                                <td class="px-4 py-2">{{ mat.trimestre }}</td>
+                                                <td class="px-4 py-2">{{ mat.nota_trimestral }}</td>
+                                                <td class="px-4 py-2">{{ mat.total_asistencias }}</td>
+                                                <td class="px-4 py-2">{{ mat.total_tareas }}</td>
+                                                <td class="px-4 py-2">{{ mat.total_participaciones }}</td>
+                                                <td class="px-4 py-2">{{ mat.total_examenes }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <ng-template #sinMaterias>
+                                    <p class="text-gray-500">No hay datos de materias disponibles.</p>
+                                </ng-template>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+
+            <!-- Mensaje cuando no hay estudiantes -->
+            <div *ngIf="!estudiantes.length" class="text-center py-4 text-gray-500">
+                No hay estudiantes registrados en este curso
+            </div>
+        </div>
+
+    </div>
+</div>
